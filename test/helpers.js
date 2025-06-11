@@ -64,12 +64,15 @@ module.exports.assertFilesExist = function assertFilesExist(stdout, home, paths)
  * @param {function} done - Should be passed by Mocha test
  */
 module.exports.weAreOnline = function weAreOnline(done) {
-  const dns = require('dns');
-  dns.lookup('google.com', (err) => {
-    if (err && err.code === 'ENOTFOUND') {
+  const https = require('https');
+  https
+    .get('https://google.com', (res) => {
+      res.resume();
+      done();
+    })
+    .on('error', () => {
       console.log('No internet connection, skipping tests');
       this.skip();
-    }
-    done();
-  });
+      done();
+    });
 };
